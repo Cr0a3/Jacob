@@ -55,6 +55,14 @@ impl IrOperand {
             IrOperand::Variable { name: _, ty } => ty,
         }
     }
+
+    /// A named variable
+    pub fn named(name: &str, ty: TypeMetadata) -> IrOperand {
+        IrOperand::Variable {
+            name: name.to_string(),
+            ty,
+        }
+    }
 }
 
 impl std::fmt::Display for IrOperand {
@@ -95,8 +103,13 @@ pub trait IrInstTrait: std::fmt::Debug {
     fn is_mul(&self) -> bool {
         false
     }
-    /// Checks if the ir instruction is an division instruction
+    /// Checks if the ir instruction is an div instruction
     fn is_div(&self) -> bool {
+        false
+    }
+
+    /// Checks if the ir instruction is a return instruction
+    fn is_ret(&self) -> bool {
         false
     }
 
@@ -166,7 +179,7 @@ macro_rules! ir_inst_with3_ops {
                     }
                 }
 
-                fn dump(&self) -> String { format!("{self:?}") }
+                fn dump(&self) -> String { format!("{self}") }
 
                 fn clone_box(&self) -> Box<dyn IrInstTrait> {
                     Box::new(self.clone())
@@ -178,6 +191,65 @@ macro_rules! ir_inst_with3_ops {
                     self.op1.hash(&mut hasher);
                     self.op2.hash(&mut hasher);
                     self.op3.hash(&mut hasher);
+                    hasher.finish()
+                }
+            }
+        }
+    };
+}
+
+/// Useful for defining a standard ir instruction in the ir with 1 operands.
+#[macro_export]
+macro_rules! ir_inst_with1_op {
+    ($name:ident, $out_num:expr) => {
+        ::paste::paste! {
+            /// Auto Generated IR Node
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+            pub struct [<IrInst $name>] {
+                /// Operand 1 (Maybe Input | Maybe Output)
+                pub op1: IrOperand,
+            }
+
+            impl [<IrInst $name>] {
+                /// Creates a new instance
+                pub fn raw_new(op1: IrOperand) -> Box<Self> {
+                    Box::new(Self { op1 })
+                }
+            }
+
+            impl IrInstTrait for [<IrInst $name>] {
+                fn [<is_ $name:lower>](&self) -> bool { true }
+                fn num_operands(&self) -> usize { 3 }
+
+                fn inputs(&self) -> Vec<IrOperand> {
+                    vec![ self.op1.clone() ]
+                }
+
+                fn inputs_mut(&mut self) -> Vec<&mut IrOperand> {
+                    vec![ &mut self.op1 ]
+                }
+
+                fn operand(&self, num: usize) -> Option<IrOperand> {
+                    match num {
+                        0 => Some(self.op1.clone().into()),
+                        _ => None,
+                    }
+                }
+
+                fn outputs(&self) -> Vec<IrOperand> {
+                    vec![]
+                }
+
+                fn dump(&self) -> String { format!("{self}") }
+
+                fn clone_box(&self) -> Box<dyn IrInstTrait> {
+                    Box::new(self.clone())
+                }
+
+                fn hash_value(&self) -> u64 {
+                    use std::hash::{Hash, Hasher};
+                    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+                    self.op1.hash(&mut hasher);
                     hasher.finish()
                 }
             }
@@ -237,5 +309,39 @@ impl Eq for Box<dyn IrInstTrait> {}
 impl std::hash::Hash for Box<dyn IrInstTrait> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         state.write_u64(self.hash_value());
+    }
+}
+
+impl IrInstTrait for IrInst {
+    fn operand(&self, num: usize) -> Option<IrOperand> {
+        self.inst.operand(num)
+    }
+
+    fn num_operands(&self) -> usize {
+        self.inst.num_operands()
+    }
+
+    fn dump(&self) -> String {
+        self.inst.dump()
+    }
+
+    fn inputs(&self) -> Vec<IrOperand> {
+        self.inst.inputs()
+    }
+
+    fn inputs_mut(&mut self) -> Vec<&mut IrOperand> {
+        self.inst.inputs_mut()
+    }
+
+    fn outputs(&self) -> Vec<IrOperand> {
+        self.inst.outputs()
+    }
+
+    fn clone_box(&self) -> Box<dyn IrInstTrait> {
+        self.inst.clone_box()
+    }
+
+    fn hash_value(&self) -> u64 {
+        self.inst.hash_value()
     }
 }

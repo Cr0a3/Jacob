@@ -47,8 +47,8 @@ impl Function {
     }
 
     /// Sets the name of the function
-    pub fn set_name(&mut self, name: String) {
-        self.name = Some(name);
+    pub fn set_name(&mut self, name: &str) {
+        self.name = Some(name.to_owned());
     }
 
     /// Sets the function type of the function
@@ -57,10 +57,10 @@ impl Function {
     }
 
     /// Creates a new ir block with the desired name
-    pub fn create_block(&mut self, name: String) -> usize {
+    pub fn create_block(&mut self, name: &str) -> usize {
         let id = self.ir.len();
         self.ir.push(IrBlock::Basic {
-            name,
+            name: name.to_owned(),
             insts: Vec::new(),
         });
         id
@@ -68,9 +68,10 @@ impl Function {
 
     /// Selects the given block id as the current one
     pub fn set_block(&mut self, id: usize) {
-        if self.ir.len() > id {
+        if self.ir.len() < id {
             panic!(
-                "The id of the block to set as current is outside of the functions avaliable blocks"
+                "The id of the block to set as current is outside of the functions avaliable blocks (id: {id} len: {}",
+                self.ir.len()
             );
         }
 
@@ -126,7 +127,7 @@ impl Function {
         let var = self.request_new_var(out_name, *op1.get_ty());
 
         self.add_block_body(
-            IrInstAdd::raw_new(op1.to_owned(), op2.to_owned(), var.clone()),
+            IrInstAdd::raw_new(var.clone(), op1.to_owned(), op2.to_owned()),
             dbg,
         );
 
@@ -145,7 +146,7 @@ impl Function {
         let var = self.request_new_var(out_name, *op1.get_ty());
 
         self.add_block_body(
-            IrInstSub::raw_new(op1.to_owned(), op2.to_owned(), var.clone()),
+            IrInstSub::raw_new(var.clone(), op1.to_owned(), op2.to_owned()),
             dbg,
         );
 
@@ -164,7 +165,7 @@ impl Function {
         let var = self.request_new_var(out_name, *op1.get_ty());
 
         self.add_block_body(
-            IrInstMul::raw_new(op1.to_owned(), op2.to_owned(), var.clone()),
+            IrInstMul::raw_new(var.clone(), op1.to_owned(), op2.to_owned()),
             dbg,
         );
 
@@ -183,10 +184,54 @@ impl Function {
         let var = self.request_new_var(out_name, *op1.get_ty());
 
         self.add_block_body(
-            IrInstDiv::raw_new(op1.to_owned(), op2.to_owned(), var.clone()),
+            IrInstDiv::raw_new(var.clone(), op1.to_owned(), op2.to_owned()),
             dbg,
         );
 
         var
+    }
+
+    /// Builds a ret ir node
+    pub fn ret(&mut self, op: &IrOperand, dbg: Option<IrInstDebugNote>) {
+        self.add_block_body(IrInstRet::raw_new(op.to_owned()), dbg);
+    }
+}
+
+impl std::fmt::Display for Function {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = if let Some(name) = self.name.as_ref() {
+            name.as_str()
+        } else {
+            "unnamend"
+        };
+
+        let ret = if let Some(ty) = self.function_type.ret {
+            &format!("-> {ty:?}")
+        } else {
+            ""
+        };
+
+        write!(f, "func {name}(")?;
+        for (index, (name, ty)) in self.function_type.args.iter().enumerate() {
+            if index != 0 {
+                write!(f, ", ")?;
+            }
+            write!(f, "{name}: {ty:?}")?;
+        }
+        writeln!(f, ") {ret} {{")?;
+
+        for block in &self.ir {
+            match block {
+                IrBlock::Basic { name, insts } => {
+                    writeln!(f, "  .b{name}")?;
+
+                    for inst in insts {
+                        writeln!(f, "    {}", inst.dump())?;
+                    }
+                }
+            }
+        }
+
+        writeln!(f, "}}")
     }
 }

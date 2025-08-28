@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+use crate::ir::IrOperand;
+
 /// # FunctionType
 ///
 /// This struct saves the actual type of the function.
@@ -8,8 +10,8 @@ use std::collections::BTreeMap;
 ///  - The (optional) return type
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FunctionType {
-    args: BTreeMap<String, TypeMetadata>,
-    ret: Option<TypeMetadata>,
+    pub(crate) args: BTreeMap<String, TypeMetadata>,
+    pub(crate) ret: Option<TypeMetadata>,
 }
 
 impl FunctionType {
@@ -28,8 +30,9 @@ impl FunctionType {
     }
 
     /// Adds an argument to the function type
-    pub fn add_arg(&mut self, name: String, ty: TypeMetadata) {
-        self.args.insert(name, ty);
+    pub fn add_arg(&mut self, name: &str, ty: TypeMetadata) -> IrOperand {
+        self.args.insert(name.to_owned(), ty);
+        IrOperand::named(name, ty)
     }
 }
 
