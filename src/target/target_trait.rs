@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use as_any::AsAny;
 
 use crate::{code_gen::target::Target, ir::ir::IrInst, mc::McNode};
@@ -5,7 +7,7 @@ use crate::{code_gen::target::Target, ir::ir::IrInst, mc::McNode};
 /// # Target Archictecture
 ///
 /// This trait is used to describe a given target architecture
-pub trait TargetArchitecture: McInstHandler + AssemblyTransformer + AsAny {
+pub trait TargetArchitecture: McInstHandler + AssemblyTransformer + AsAny + Debug {
     /// Returns the name of the target Architecture
     fn name(&self) -> &'static str;
     /// Returns if the given target matches the architecture

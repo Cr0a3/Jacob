@@ -63,6 +63,14 @@ impl IrOperand {
             ty,
         }
     }
+
+    /// Force gets the name
+    pub fn force_name(&self) -> String {
+        match self {
+            IrOperand::Const { ty: _, value: _ } => panic!("Consts have no name"),
+            IrOperand::Variable { name, ty: _ } => name.to_owned(),
+        }
+    }
 }
 
 impl std::fmt::Display for IrOperand {
@@ -90,6 +98,8 @@ pub trait IrInstTrait: std::fmt::Debug {
     /// Returns the outputs as a list
     fn outputs(&self) -> Vec<IrOperand>;
 
+    /// Returns the type of the operands of the ir node
+    fn get_ty(&self) -> TypeMetadata;
     // ToDo: add more checker functions
     /// Checks if the ir instruction is an add instruction
     fn is_add(&self) -> bool {
@@ -193,6 +203,8 @@ macro_rules! ir_inst_with3_ops {
                     self.op3.hash(&mut hasher);
                     hasher.finish()
                 }
+
+                fn get_ty(&self) -> $crate::TypeMetadata { *self.op1.get_ty() }
             }
         }
     };
@@ -252,6 +264,8 @@ macro_rules! ir_inst_with1_op {
                     self.op1.hash(&mut hasher);
                     hasher.finish()
                 }
+
+                fn get_ty(&self) -> $crate::TypeMetadata { *self.op1.get_ty() }
             }
         }
     };
@@ -363,5 +377,9 @@ impl IrInstTrait for IrInst {
 
     fn is_ret(&self) -> bool {
         self.inst.is_ret()
+    }
+
+    fn get_ty(&self) -> TypeMetadata {
+        self.inst.get_ty()
     }
 }

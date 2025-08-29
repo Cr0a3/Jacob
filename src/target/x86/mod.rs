@@ -6,6 +6,7 @@ pub mod asm_trans;
 pub mod mc_inst;
 
 /// The target for the x86 64 bit architecture
+#[derive(Debug)]
 pub struct X86Target {}
 
 impl X86Target {
