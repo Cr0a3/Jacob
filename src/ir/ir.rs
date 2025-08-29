@@ -344,4 +344,24 @@ impl IrInstTrait for IrInst {
     fn hash_value(&self) -> u64 {
         self.inst.hash_value()
     }
+
+    fn is_add(&self) -> bool {
+        self.inst.is_add()
+    }
+
+    fn is_sub(&self) -> bool {
+        self.inst.is_sub()
+    }
+
+    fn is_mul(&self) -> bool {
+        self.inst.is_mul()
+    }
+
+    fn is_div(&self) -> bool {
+        self.inst.is_div()
+    }
+
+    fn is_ret(&self) -> bool {
+        self.inst.is_ret()
+    }
 }

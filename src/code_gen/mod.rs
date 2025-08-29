@@ -1,0 +1,13 @@
+//! This contains all things which have to do with the code gen (not for individual backends, but shared. For individual
+//! backends the code is in the `Target` folder)
+
+/// Builds the architecture dependend assembly code
+pub mod asm_builder;
+/// Compilation output
+pub mod compilation;
+/// Cross architecture instrúctions
+pub mod mc;
+/// Lowering the IR to the closest thing capable of being shared across multiple architecturs
+pub mod mcinst_builder;
+/// Control of the compilation target architecture
+pub mod target;

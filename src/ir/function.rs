@@ -1,5 +1,5 @@
 use crate::{
-    ir::{IrBlock, IrInst, IrInstDebugNote, IrInstTrait, IrOperand},
+    ir::ir::{IrBlock, IrInst, IrInstDebugNote, IrInstTrait, IrOperand},
     nodes::*,
     ty::{FunctionType, TypeMetadata},
 };
@@ -17,27 +17,21 @@ use crate::{
 /// the neccessary builder methods
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Function {
-    name: Option<String>,
-    function_type: FunctionType,
-    ir: Vec<IrBlock>,
+    pub(crate) name: String,
+    pub(crate) function_type: FunctionType,
+    pub(crate) ir: Vec<IrBlock>,
 
     // Used for building the ir
     curr_block_index: usize,
     curr_var_index: usize,
 }
 
-impl Default for Function {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Function {
     /// Creates a new empty function, with no arguments,
     /// no return type, no ir and no name
-    pub fn new() -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
-            name: None,
+            name: name.to_owned(),
             function_type: FunctionType::default(),
             ir: Vec::new(),
 
@@ -48,7 +42,7 @@ impl Function {
 
     /// Sets the name of the function
     pub fn set_name(&mut self, name: &str) {
-        self.name = Some(name.to_owned());
+        self.name = name.to_owned();
     }
 
     /// Sets the function type of the function
@@ -199,19 +193,13 @@ impl Function {
 
 impl std::fmt::Display for Function {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name = if let Some(name) = self.name.as_ref() {
-            name.as_str()
-        } else {
-            "unnamend"
-        };
-
         let ret = if let Some(ty) = self.function_type.ret {
             &format!("-> {ty:?}")
         } else {
             ""
         };
 
-        write!(f, "func {name}(")?;
+        write!(f, "func {}(", self.name)?;
         for (index, (name, ty)) in self.function_type.args.iter().enumerate() {
             if index != 0 {
                 write!(f, ", ")?;

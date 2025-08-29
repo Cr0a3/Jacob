@@ -4,22 +4,25 @@
 #![forbid(non_snake_case)]
 
 use crate::{
+    code_gen::target::Target,
     function::Function,
+    module::Module,
     ty::{FunctionType, TypeMetadata},
 };
 
-/// The function struct + ir building functions
-pub mod function;
-/// Raw Ir
+mod code_gen;
+pub use code_gen::*;
+
+pub mod target;
+pub use target::*;
+
 pub mod ir;
-/// Real ir nodes
-pub mod nodes;
-/// Type metadata
-pub mod ty;
+pub use ir::*;
 
 fn main() {
-    let mut func = Function::new();
-    func.set_name("add");
+    let mut module = Module::new();
+
+    let mut func = Function::new("add");
 
     let block = func.create_block("0");
     func.set_block(block);
@@ -34,5 +37,8 @@ fn main() {
 
     func.ret(&add, None);
 
-    println!("{func}")
+    module.add_func(func);
+
+    let out = module.compile(Target::X86);
+    println!("{}", out.asm());
 }

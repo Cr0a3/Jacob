@@ -1,4 +1,4 @@
-use crate::ir::*;
+use crate::ir::ir::{IrInstTrait, IrOperand};
 use crate::ir_inst_with3_ops;
 
 ir_inst_with3_ops!(Add, Some(0));

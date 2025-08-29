@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::ir::IrOperand;
+use crate::ir::ir::IrOperand;
 
 /// # FunctionType
 ///
