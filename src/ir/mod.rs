@@ -1,12 +1,18 @@
-//! This contains all things which have to do with the ir
+//! Internal representation
 
-/// The function struct + ir building functions
+/// Function
 pub mod function;
-/// Raw Ir
-pub mod ir;
-/// A module (contains the ir for one object file)
+/// Compilation unit
 pub mod module;
-/// Real ir nodes
-pub mod nodes;
-/// Type metadata
+/// Ir nodes
+pub mod node;
+/// Ir Operand
+pub mod operand;
+/// Types
 pub mod ty;
+
+pub use function::*;
+pub use module::*;
+pub use node::*;
+pub use operand::*;
+pub use ty::*;
