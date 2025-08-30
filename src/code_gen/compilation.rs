@@ -21,6 +21,8 @@ pub fn compile(module: &Module, target: Target) -> Compilation {
     let mut builder = McInstBuilder::build(module, arch);
     builder.use_regalloc(RegisterAllocator::LinearScan, target);
 
+    println!("{builder:#?}");
+
     let mut machine = MachineAssemblyBuilder::new(builder, target);
     machine.lower();
 

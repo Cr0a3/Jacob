@@ -4,6 +4,7 @@ use crate::{
     Target,
     function::Function,
     ir::ir::{IrBlock, IrInst, IrInstTrait, IrOperand},
+    linear_scan::LinearScan,
     mc::{McInstOpCode, McInstValue, McNode},
     mc_dce::mcinst_dce,
     module::Module,
@@ -55,10 +56,7 @@ impl McInstBuilder {
         }
 
         builder.route_ops();
-
         mcinst_dce(&mut builder);
-
-        println!("{:#?}", builder);
 
         builder
     }
@@ -79,6 +77,7 @@ impl McInstBuilder {
                 operands: vec![],
                 value_types: vec![*ty],
                 node_id: self.last_node_id,
+                out_allocate: None,
             };
             func.arg_insts.push(node);
             self.last_node_id += 1;
@@ -152,6 +151,7 @@ impl McInstBuilder {
             value_types: vec![inst.get_ty(), inst.get_ty()],
             node_id: self.last_node_id,
             out: Some(inst.outputs()[0].force_name()),
+            out_allocate: None,
         };
         self.last_node_id += 1;
         node
@@ -166,6 +166,7 @@ impl McInstBuilder {
             value_types: vec![inst.get_ty()],
             node_id: self.last_node_id,
             out: None,
+            out_allocate: None,
         };
         self.last_node_id += 1;
         node
@@ -180,6 +181,7 @@ impl McInstBuilder {
                     value_types: vec![*ty],
                     node_id: self.last_node_id,
                     out: None,
+                    out_allocate: None,
                 };
                 self.last_node_id += 1;
 
@@ -200,6 +202,7 @@ impl McInstBuilder {
                     value_types: vec![*ty],
                     node_id: self.last_node_id,
                     out: None,
+                    out_allocate: None,
                 };
                 self.last_node_id += 1;
 
@@ -269,7 +272,10 @@ impl McInstBuilder {
     /// Allocates the registers on the machine instructions
     pub fn use_regalloc(&mut self, allocator: RegisterAllocator, target: Target) {
         match allocator {
-            RegisterAllocator::LinearScan => todo!("ToDo: Run linear scan for {target:?}"),
+            RegisterAllocator::LinearScan => {
+                let mut regalloc = LinearScan::new(self, target);
+                regalloc.run();
+            }
         }
     }
 }
