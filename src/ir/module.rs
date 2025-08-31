@@ -1,7 +1,7 @@
 use std::{any::TypeId, collections::HashMap};
 
 use crate::{
-    codegen::{self, ArchBackend, TargetArch},
+    codegen::{self, ArchBackend, FuncAsm, TargetArch},
     ir::Function,
     opt::*,
     x86::X86Backend,
@@ -85,16 +85,16 @@ impl Module {
         };
 
         for func in &self.funcs {
+            let mut asm = FuncAsm::new();
+
             let mut dropper = codegen::Dropper::new(func.ir.clone());
             dropper.run();
 
             let mut regalloc = codegen::RegAlloc::new(func.args.clone(), &*backend);
             regalloc.run(dropper.get_ir());
 
-            println!("{:#?}", regalloc.get_ir());
-
-            //let mut inst = codegen::InstSelector::new(func.args.clone(), regalloc.get_ir().clone())
-            //inst.run();
+            let mut inst = codegen::InstSelector::new(regalloc.get_ir(), &*backend);
+            inst.run(&mut asm);
 
             todo!()
         }

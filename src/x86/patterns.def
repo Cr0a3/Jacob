@@ -1,0 +1,5 @@
+def ADD<i32> (ins $src1, $src2) (outs $dst) (r, r, r) {
+    where: $src1 == $dst
+
+    asm: "lea $dst, [$src1, $src2]"
+}

@@ -1,6 +1,9 @@
 use std::any::Any;
 
-use crate::{codegen::Allocation, ir::TypeMetadata};
+use crate::{
+    codegen::{AllocatedIrNode, Allocation, AssemblyInst},
+    ir::TypeMetadata,
+};
 
 /// The target architecture
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,7 +13,7 @@ pub enum TargetArch {
 }
 
 /// The trait to implement when defining the backend for a custom architecture
-pub trait ArchBackend: Any {
+pub trait ArchBackend: Any + BackendInst {
     /// Returns the name of the backend
     fn name(&self) -> &'static str;
 
@@ -48,4 +51,10 @@ pub trait Reg: Any + std::fmt::Debug {
 
     /// Returns the type of the register
     fn ty(&self) -> TypeMetadata;
+}
+
+/// This trait is used to lower ir nodes into ir
+pub trait BackendInst {
+    /// Lowers the given ir instruction
+    fn lower_inst(&self, ir: &AllocatedIrNode) -> AssemblyInst;
 }

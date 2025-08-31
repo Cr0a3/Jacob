@@ -1,7 +1,9 @@
 //! The x86 backend
 
+use procmacro::pattern;
+
 use crate::{
-    codegen::{Allocation, ArchBackend, Reg},
+    codegen::{Allocation, ArchBackend, BackendInst, Reg},
     ir::TypeMetadata,
     x86::regs::*,
 };
@@ -59,5 +61,11 @@ impl ArchBackend for X86Backend {
         }
 
         Allocation::Stack { slot: num - 5, ty }
+    }
+}
+
+impl BackendInst for X86Backend {
+    fn lower_inst(&self, ir: &crate::codegen::AllocatedIrNode) -> crate::codegen::AssemblyInst {
+        pattern!(ir);
     }
 }
