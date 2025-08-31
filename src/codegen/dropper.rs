@@ -1,18 +1,16 @@
-use std::{collections::VecDeque, os, rc::Rc};
-
-use crate::ir::{IrOperand, TypeMetadata};
+use crate::ir::IrOperand;
+use std::rc::Rc;
 
 /// Helper structure to insert resource dropping instructions in the ir
 /// which will make the register allocators work easier
 pub struct Dropper {
-    args: Vec<TypeMetadata>,
     ir: Vec<IrOperand>,
 }
 
 impl Dropper {
     /// Creates a new dropper
-    pub fn new(args: Vec<TypeMetadata>, ir: Vec<IrOperand>) -> Self {
-        Self { args, ir }
+    pub fn new(ir: Vec<IrOperand>) -> Self {
+        Self { ir }
     }
 
     /// Inserts dropping instructions into the ir

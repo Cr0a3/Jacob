@@ -1,5 +1,7 @@
 use std::any::Any;
 
+use crate::{codegen::Allocation, ir::TypeMetadata};
+
 /// The target architecture
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TargetArch {
@@ -20,6 +22,9 @@ pub trait ArchBackend: Any {
 
     /// Returns a list of all gpr registers
     fn grps(&self) -> Vec<Box<dyn Reg>>;
+
+    /// Returns the position for an argument
+    fn callconv_argpos(&self, num: usize, ty: TypeMetadata) -> Allocation;
 }
 
 /// The trait to implement for defining custom register
@@ -37,4 +42,10 @@ pub trait Reg: Any + std::fmt::Debug {
     fn callee_saved(&self) -> bool {
         !self.caller_saved()
     }
+
+    /// Returns the id of the register
+    fn id(&self) -> usize;
+
+    /// Returns the type of the register
+    fn ty(&self) -> TypeMetadata;
 }

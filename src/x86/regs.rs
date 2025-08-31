@@ -39,14 +39,15 @@ pub const R14: X86Reg = X86Reg { id: 14 };
 /// The r15 register
 pub const R15: X86Reg = X86Reg { id: 15 };
 
-impl X86Reg {
-    /// Returns the id of the register
-    pub fn id(&self) -> usize {
+impl Reg for X86Reg {
+    fn id(&self) -> usize {
         self.id
     }
-}
 
-impl Reg for X86Reg {
+    fn ty(&self) -> crate::ir::TypeMetadata {
+        crate::ir::TypeMetadata::Int64
+    }
+
     fn name(&self) -> &'static str {
         match self.id {
             val if val == RAX.id() => "rax",

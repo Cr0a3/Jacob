@@ -1,6 +1,10 @@
 //! The x86 backend
 
-use crate::{codegen::ArchBackend, x86::regs::*};
+use crate::{
+    codegen::{Allocation, ArchBackend, Reg},
+    ir::TypeMetadata,
+    x86::regs::*,
+};
 
 /// The registers to use in x86
 pub mod regs;
@@ -30,10 +34,30 @@ impl ArchBackend for X86Backend {
 
     fn grps(&self) -> Vec<Box<dyn crate::codegen::Reg>> {
         let regs: Vec<X86Reg> = vec![
-            RAX, RCX, RDX, RBX, RSI, RDI, R8, R9, R10, R11, R12, R13, R14, R15,
+            RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11, RBX, R12, R13, R14,
         ];
         regs.iter()
             .map(|x| Box::new(*x) as Box<dyn crate::codegen::Reg>)
             .collect()
+    }
+
+    fn callconv_argpos(&self, num: usize, ty: TypeMetadata) -> Allocation {
+        if num < 6 {
+            return Allocation::Register {
+                id: match num {
+                    0 => RDI,
+                    1 => RSI,
+                    2 => RCX,
+                    3 => RDX,
+                    4 => R8,
+                    5 => R9,
+                    _ => unreachable!(),
+                }
+                .id(),
+                ty,
+            };
+        }
+
+        Allocation::Stack { slot: num - 5, ty }
     }
 }

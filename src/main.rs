@@ -15,13 +15,13 @@ fn main() {
 
     let mut func = Function::new("add");
 
-    let x = func.add_arg(ir::TypeMetadata::Int32);
-    let y = func.add_arg(ir::TypeMetadata::Int32);
+    let x = func.add_arg(ir::TypeMetadata::Int64);
+    let y = func.add_arg(ir::TypeMetadata::Int64);
 
     let result = func.add(&x, &y);
     func.ret(&result);
 
     module.add_func(func);
 
-    module.compile();
+    module.compile(codegen::TargetArch::X86);
 }

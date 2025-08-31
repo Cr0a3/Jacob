@@ -51,9 +51,24 @@ impl IrOperand {
     /// Force gets a node (if it's something else e.g: an arg it just panics)
     pub fn force_node(&self) -> &Rc<RefCell<IrNode>> {
         match self {
-            IrOperand::Arg { num: _, ty: _ } => panic!(),
             IrOperand::Out(ref_cell) => ref_cell,
-            IrOperand::Drop(_) => panic!(),
+            _ => panic!(),
+        }
+    }
+
+    /// Force gets the internal operand for the drop variant
+    pub fn force_op(&self) -> &Rc<IrOperand> {
+        match self {
+            IrOperand::Drop(rc) => rc,
+            _ => panic!(),
+        }
+    }
+
+    /// Force gets the argument data fields for the arg variant
+    pub fn force_arg(&self) -> (usize, TypeMetadata) {
+        match self {
+            IrOperand::Arg { num, ty } => (*num, *ty),
+            _ => panic!(),
         }
     }
 }

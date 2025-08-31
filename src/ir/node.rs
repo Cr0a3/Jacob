@@ -7,7 +7,7 @@ use std::{
 use crate::ir::{operand::IrOperand, ty::TypeMetadata};
 
 /// The opcode of the node
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IrOpcode {
     /// An addition
     Add,

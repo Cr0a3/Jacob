@@ -1,6 +1,11 @@
 use std::{any::TypeId, collections::HashMap};
 
-use crate::{codegen, ir::Function, opt::*};
+use crate::{
+    codegen::{self, ArchBackend, TargetArch},
+    ir::Function,
+    opt::*,
+    x86::X86Backend,
+};
 
 /// Includes multiple functions and easy access to optimizations/compilation
 pub struct Module {
@@ -70,17 +75,21 @@ impl Module {
     }
 
     /// Compiles the module
-    pub fn compile(&mut self) {
+    pub fn compile(&mut self, target: TargetArch) {
         self.add_opt::<Dce>();
         self.run_opts();
         self.clear_opts();
 
+        let backend: Box<dyn ArchBackend> = match target {
+            TargetArch::X86 => Box::new(X86Backend {}),
+        };
+
         for func in &self.funcs {
-            let mut dropper = codegen::Dropper::new(func.args.clone(), func.ir.clone());
+            let mut dropper = codegen::Dropper::new(func.ir.clone());
             dropper.run();
 
-            let mut regalloc = codegen::RegAlloc::new(func.args.clone(), dropper.get_ir().clone());
-            regalloc.run();
+            let mut regalloc = codegen::RegAlloc::new(func.args.clone(), &*backend);
+            regalloc.run(dropper.get_ir());
 
             println!("{:#?}", regalloc.get_ir());
 
