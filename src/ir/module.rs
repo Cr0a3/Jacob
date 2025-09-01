@@ -96,7 +96,7 @@ impl Module {
             let mut inst = codegen::InstSelector::new(regalloc.get_ir(), &*backend);
             inst.run(&mut asm);
 
-            todo!()
+            println!("{:#?}", asm);
         }
 
         todo!()

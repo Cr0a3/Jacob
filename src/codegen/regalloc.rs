@@ -24,6 +24,26 @@ pub enum Allocation {
     },
 }
 
+impl Allocation {
+    /// Returns if it's a register
+    #[inline]
+    pub fn is_gr(&self) -> bool {
+        matches!(self, Allocation::Register { .. })
+    }
+
+    /// Returns if it's a stack var
+    #[inline]
+    pub fn is_mem(&self) -> bool {
+        matches!(self, Allocation::Stack { .. })
+    }
+
+    /// Returns if it's a constant int
+    #[inline]
+    pub fn is_imm(&self) -> bool {
+        false
+    }
+}
+
 /// same as `src/ir/operand.rs - IrOperand` but with a allocated dest
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AllocatedIrOperand {

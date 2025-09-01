@@ -57,4 +57,7 @@ pub trait Reg: Any + std::fmt::Debug {
 pub trait BackendInst {
     /// Lowers the given ir instruction
     fn lower_inst(&self, ir: &AllocatedIrNode) -> AssemblyInst;
+
+    /// Gets the ir for the given assembly instruction
+    fn disasm_inst(&self, asm: &AssemblyInst) -> AllocatedIrNode;
 }
