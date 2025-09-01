@@ -74,5 +74,8 @@ impl BackendInst for X86Backend {
             condition: in1 != out && in2 != out
             asm: lea (out, in1, in2)
         }
+        Ret(Gr) {
+            asm: ret(out)
+        }
     }
 }
