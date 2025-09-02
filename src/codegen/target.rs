@@ -1,19 +1,28 @@
 use std::any::Any;
 
 use crate::{
-    codegen::{AllocatedIrNode, Allocation, AssemblyInst},
+    codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation},
     ir::TypeMetadata,
 };
 
 /// The target architecture
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArch {
     /// 64Bit x86
     X86,
 }
 
+impl TargetArch {
+    /// Returns the backend for the architecture
+    pub fn backend(&self) -> Box<dyn ArchBackend> {
+        match self {
+            TargetArch::X86 => Box::new(crate::x86::X86Backend {}),
+        }
+    }
+}
+
 /// The trait to implement when defining the backend for a custom architecture
-pub trait ArchBackend: Any + BackendInst {
+pub trait ArchBackend: Any + BackendInst + AsmPrinter {
     /// Returns the name of the backend
     fn name(&self) -> &'static str;
 
@@ -60,4 +69,52 @@ pub trait BackendInst {
 
     /// Gets the ir for the given assembly instruction
     fn disasm_inst(&self, asm: &AssemblyInst) -> AllocatedIrNode;
+}
+
+/// This trait is used to implement asm printing for the given architecture
+pub trait AsmPrinter {
+    /// Prints a compilation result in assembly
+    fn print_compilation(&self, compilation: &Compilation) -> String {
+        let mut out = self.print_comment("Compilation output");
+
+        for func in &compilation.funcs {
+            out += &self.print_func_name(&func.name);
+            for inst in &func.insts {
+                out += &self.print_inst(inst);
+            }
+        }
+
+        out
+    }
+
+    /// Prints a commit
+    fn print_comment(&self, text: &str) -> String {
+        format!("// {text}\n")
+    }
+
+    /// Prints a function name
+    fn print_func_name(&self, name: &str) -> String {
+        format!("{name}:\n")
+    }
+
+    /// Prints an operand
+    fn print_op(&self, op: &Allocation) -> String;
+
+    /// Prints the register from it's name
+    fn print_reg(&self, num: &usize, ty: &TypeMetadata) -> String;
+
+    /// Prints the code for an instruction
+    fn print_inst(&self, inst: &AssemblyInst) -> String {
+        let mut ops = String::new();
+
+        for (index, op) in inst.ops.iter().enumerate() {
+            if index != 0 {
+                ops += ", ";
+            }
+
+            ops += &self.print_op(op);
+        }
+
+        format!("\t{} {}\n", inst.opcode, ops)
+    }
 }

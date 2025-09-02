@@ -3,8 +3,8 @@ use crate::codegen::Allocation;
 /// Structure to store an assembly instruction
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssemblyInst {
-    ops: Vec<Allocation>,
-    opcode: String,
+    pub(crate) ops: Vec<Allocation>,
+    pub(crate) opcode: String,
 }
 
 impl AssemblyInst {

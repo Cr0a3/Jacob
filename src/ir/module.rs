@@ -1,10 +1,9 @@
 use std::{any::TypeId, collections::HashMap};
 
 use crate::{
-    codegen::{self, ArchBackend, FuncAsm, TargetArch},
+    codegen::{self, Compilation, FuncAsm, TargetArch},
     ir::Function,
     opt::*,
-    x86::X86Backend,
 };
 
 /// Includes multiple functions and easy access to optimizations/compilation
@@ -75,17 +74,16 @@ impl Module {
     }
 
     /// Compiles the module
-    pub fn compile(&mut self, target: TargetArch) {
+    pub fn compile(&mut self, target: TargetArch) -> Compilation {
         self.add_opt::<Dce>();
         self.run_opts();
         self.clear_opts();
 
-        let backend: Box<dyn ArchBackend> = match target {
-            TargetArch::X86 => Box::new(X86Backend {}),
-        };
+        let mut result = Compilation::new(target);
+        let backend = target.backend();
 
         for func in &self.funcs {
-            let mut asm = FuncAsm::new();
+            let mut asm = FuncAsm::new(func.name.to_owned());
 
             let mut dropper = codegen::Dropper::new(func.ir.clone());
             dropper.run();
@@ -96,9 +94,11 @@ impl Module {
             let mut inst = codegen::InstSelector::new(regalloc.get_ir(), &*backend);
             inst.run(&mut asm);
 
-            println!("{:#?}", asm);
+            result.add(asm);
         }
 
-        todo!()
+        // ToDo: add public constants and that shit
+
+        result
     }
 }

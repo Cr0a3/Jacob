@@ -3,19 +3,16 @@ use crate::codegen::{AllocatedIrNode, ArchBackend, AssemblyInst};
 /// Stores the assembly for a function
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FuncAsm {
-    insts: Vec<AssemblyInst>,
+    pub(crate) insts: Vec<AssemblyInst>,
+    pub(crate) name: String,
 }
-
-impl Default for FuncAsm {
-    fn default() -> Self {
-        FuncAsm::new()
-    }
-}
-
 impl FuncAsm {
     /// Creates a new instance
-    pub fn new() -> Self {
-        Self { insts: Vec::new() }
+    pub fn new(name: String) -> Self {
+        Self {
+            insts: Vec::new(),
+            name,
+        }
     }
 
     pub(crate) fn add(&mut self, inst: AssemblyInst) {
