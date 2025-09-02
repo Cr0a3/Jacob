@@ -6,6 +6,7 @@
 use crate::ir::{Function, Module};
 
 pub mod codegen;
+pub mod decompile;
 pub mod ir;
 pub mod opt;
 pub mod x86;
