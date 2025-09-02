@@ -23,5 +23,7 @@ fn main() {
 
     module.add_func(func);
 
-    module.compile(codegen::TargetArch::X86);
+    let asm = module.compile(codegen::TargetArch::X86);
+
+    println!("{}", asm.asm());
 }
