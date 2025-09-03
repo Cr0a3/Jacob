@@ -60,15 +60,23 @@ pub trait Reg: Any + std::fmt::Debug {
 
     /// Returns the type of the register
     fn ty(&self) -> TypeMetadata;
+
+    /// Returns the register as an allocation
+    fn alloc(&self) -> Allocation {
+        Allocation::Register {
+            id: self.id(),
+            ty: self.ty(),
+        }
+    }
 }
 
 /// This trait is used to lower ir nodes into ir
 pub trait BackendInst {
     /// Lowers the given ir instruction
-    fn lower_inst(&self, ir: &AllocatedIrNode) -> AssemblyInst;
+    fn lower_inst(&self, ir: &AllocatedIrNode) -> Vec<AssemblyInst>;
 
     /// Gets the ir for the given assembly instruction
-    fn disasm_inst(&self, asm: &AssemblyInst) -> AllocatedIrNode;
+    fn disasm_inst(&self, asm: &Vec<AssemblyInst>) -> (usize, AllocatedIrNode);
 }
 
 /// This trait is used to implement asm printing for the given architecture

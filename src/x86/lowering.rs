@@ -1,6 +1,9 @@
 use procmacro::patterns;
 
-use crate::{codegen::BackendInst, x86::X86Backend};
+use crate::{
+    codegen::{BackendInst, Reg},
+    x86::{X86Backend, regs::RAX},
+};
 
 impl BackendInst for X86Backend {
     patterns! {
@@ -17,7 +20,13 @@ impl BackendInst for X86Backend {
             asm: lea (out, in1, in2)
         }
         Ret(Gr) {
-            asm: ret(out)
+            condition: in1 == RAX.alloc()
+            asm: ret()
+        }
+        Ret(Any) {
+            condition: in1 != RAX.alloc()
+            asm: mov(RAX.alloc(), in1)
+            asm: ret()
         }
     }
 }

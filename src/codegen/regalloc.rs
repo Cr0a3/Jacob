@@ -50,6 +50,13 @@ impl Allocation {
             Allocation::Stack { slot: _, ty } => *ty,
         }
     }
+
+    /// Although this function seems very unneccessary (which it probably also is), removing
+    /// this function would result in big changes to the `patterns!` proc macro
+    #[inline]
+    pub(crate) fn is_any(&self) -> bool {
+        true
+    }
 }
 
 /// same as `src/ir/operand.rs - IrOperand` but with a allocated dest

@@ -20,8 +20,8 @@ impl FuncAsm {
         }
     }
 
-    pub(crate) fn add(&mut self, inst: AssemblyInst) {
-        self.insts.push(inst);
+    pub(crate) fn add(&mut self, inst: &Vec<AssemblyInst>) {
+        self.insts.extend_from_slice(&inst);
     }
 }
 
@@ -41,7 +41,7 @@ impl<'a, 'b> InstSelector<'a, 'b> {
     pub fn run(&mut self, funcasm: &mut FuncAsm) {
         for inst in self.ir {
             let inst = self.backend.lower_inst(inst);
-            funcasm.add(inst);
+            funcasm.add(&inst);
         }
     }
 }
