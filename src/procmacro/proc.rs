@@ -1,3 +1,5 @@
+//! This crate contains all procedual macros used in the code generation library
+
 extern crate proc_macro;
 use std::collections::HashMap;
 
@@ -186,6 +188,49 @@ fn rewrite_asm_expr(expr: &syn::Expr) -> syn::Expr {
     expr
 }
 
+fn get_asm_inst(asm: &Option<Expr>) -> String {
+    if let Some(Expr::Call(c)) = asm {
+        if let Expr::Path(ExprPath { path, .. }) = c.func.as_ref() {
+            return path
+                .segments
+                .last()
+                .map(|segment| segment.ident.to_string())
+                .unwrap()
+                .to_owned();
+        }
+        panic!("No function name was supplyed")
+    }
+    panic!("Asm needs to be parsed as an call instruction")
+}
+
+/// This procedual macro is used to build backend compilation support!
+///
+/// It automaticlly implements compilation and decompilation from the specified
+/// patterns
+///
+/// Example:
+/// ```rust no-run
+/// impl BackendInst for X86Backend {
+///    patterns! {
+///        Add(Gr, Gr) -> Gr {
+///            condition: in1 == out
+///            asm: add (in1, in2)
+///        }
+///        Add(Gr, Gr) -> Gr {
+///            condition: in2 == out
+///            asm: add (in2, in1)
+///        }
+///        Add(Gr, Gr) -> Gr {
+///            condition: in1 != out && in2 != out
+///            asm: lea (out, in1, in2)
+///        }
+///        Ret(Gr) {
+///            asm: ret(out)
+///        }
+///    }
+///}
+///
+/// ```
 #[proc_macro]
 pub fn patterns(input: TokenStream) -> TokenStream {
     let patterns = parse_macro_input!(input as Patterns).0;
@@ -247,6 +292,80 @@ pub fn patterns(input: TokenStream) -> TokenStream {
         }
     });
 
+    let mut dgrouped: HashMap<String, Vec<&Pattern>> = HashMap::new();
+    for pat in &patterns {
+        dgrouped
+            .entry(get_asm_inst(&pat.asm))
+            .or_default()
+            .push(pat);
+    }
+    let disasm_inst_match = dgrouped.into_iter().map(|(name, pats)| {
+        let arms = pats.iter().map(|p| {
+            let num_ops = p.ins.len() + p.out.is_some() as usize;
+
+            let out_check = if let Some(out) = p.out {
+                let func_ident = match out {
+                    Pos::Gr => format_ident!("is_gr"),
+                    Pos::Mem => format_ident!("is_mem"),
+                    Pos::Imm => format_ident!("is_imm"),
+                };
+                quote! {
+                    && asm.ops[0].#func_ident()
+                }
+            } else {
+                quote! {}
+            };
+
+            let ins_check = p.ins.iter().enumerate().map(|(index, pos)| {
+                let func_ident = match pos {
+                    Pos::Gr => format_ident!("is_gr"),
+                    Pos::Mem => format_ident!("is_mem"),
+                    Pos::Imm => format_ident!("is_imm"),
+                };
+                quote! { && asm.ops[#index].#func_ident() }
+            });
+
+            let opcode = format_ident!("{}", p.name);
+            let has_out = p.out.is_some();
+            let alloc = if has_out {
+                quote! { Some(asm.ops[0]) }
+            } else {
+                quote! { None}
+            };
+            let ty = quote! { asm.get_ty() };
+
+            let ops = p.ins.iter().enumerate().map(|(index, _)| {
+                let mut starting_comma = quote! { , };
+                if index == 0 {
+                    starting_comma = quote! {}
+                };
+
+                quote! {
+                    #starting_comma asm.ops[#index]
+                }
+            });
+
+            quote! {
+                if asm.operands() == #num_ops #out_check #(#ins_check)* {
+                    return crate::codegen::AllocatedIrNode {
+                        opcode: crate::ir::IrOpcode::#opcode,
+                        ops: vec![#(#ops)*],
+                        has_out: #has_out,
+                        ty: #ty,
+                        alloc: #alloc,
+                    };
+                }
+            }
+        });
+
+        quote! {
+            #name => {
+                #(#arms)*
+                panic!("no matching pattern for {:?}", asm);
+            }
+        }
+    });
+
     quote! {
         fn lower_inst(&self, inst: &crate::codegen::AllocatedIrNode) -> crate::codegen::AssemblyInst {
             match inst.opcode {
@@ -256,7 +375,10 @@ pub fn patterns(input: TokenStream) -> TokenStream {
         }
 
         fn disasm_inst(&self, asm: &crate::codegen::AssemblyInst) -> crate::codegen::AllocatedIrNode {
-            todo!("Implement match generateration for instruction disassembly in the patterns proc macro")
+            match asm.opcode.as_str() {
+                #(#disasm_inst_match)*
+                unhandled => todo!("Unhandled asm instruction: {:?}", unhandled),
+            }
         }
     }
     .into()

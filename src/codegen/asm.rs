@@ -1,4 +1,4 @@
-use crate::codegen::Allocation;
+use crate::{codegen::Allocation, ir::TypeMetadata};
 
 /// Structure to store an assembly instruction
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -46,5 +46,19 @@ impl AssemblyInst {
             opcode: opcode.to_owned(),
             ops: ops.iter().map(|x| **x).collect(),
         }
+    }
+
+    /// Returns the number of operands the function has
+    pub fn operands(&self) -> usize {
+        self.ops.len()
+    }
+
+    /// Returns the type of the assembly instruction (based on the first operand)
+    pub fn get_ty(&self) -> Option<TypeMetadata> {
+        if self.ops.is_empty() {
+            return None;
+        }
+
+        Some(self.ops[0].get_ty())
     }
 }

@@ -1,9 +1,7 @@
 //! The x86 backend
 
-use procmacro::patterns;
-
 use crate::{
-    codegen::{Allocation, ArchBackend, BackendInst, Reg},
+    codegen::{Allocation, ArchBackend, Reg},
     ir::TypeMetadata,
     x86::regs::*,
 };
@@ -12,6 +10,7 @@ use crate::{
 pub mod regs;
 
 mod asmprinter;
+mod lowering;
 
 /// This structure defines the entire x86 backend
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -63,25 +62,5 @@ impl ArchBackend for X86Backend {
         }
 
         Allocation::Stack { slot: num - 5, ty }
-    }
-}
-
-impl BackendInst for X86Backend {
-    patterns! {
-        Add(Gr, Gr) -> Gr {
-            condition: in1 == out
-            asm: add (in1, in2)
-        }
-        Add(Gr, Gr) -> Gr {
-            condition: in2 == out
-            asm: add (in2, in1)
-        }
-        Add(Gr, Gr) -> Gr {
-            condition: in1 != out && in2 != out
-            asm: lea (out, in1, in2)
-        }
-        Ret(Gr) {
-            asm: ret(out)
-        }
     }
 }

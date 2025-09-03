@@ -42,6 +42,14 @@ impl Allocation {
     pub fn is_imm(&self) -> bool {
         false
     }
+
+    /// Returns the type of the allocation (not Register/Stack but Int64 for example)
+    pub fn get_ty(&self) -> TypeMetadata {
+        match self {
+            Allocation::Register { id: _, ty } => *ty,
+            Allocation::Stack { slot: _, ty } => *ty,
+        }
+    }
 }
 
 /// same as `src/ir/operand.rs - IrOperand` but with a allocated dest
