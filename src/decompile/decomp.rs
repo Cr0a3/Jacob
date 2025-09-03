@@ -40,8 +40,15 @@ impl DecompilationHelper {
         let back = self.asm.arch.backend();
         let mut alloc_ir = Vec::new();
 
-        for inst in &asm.insts {
-            alloc_ir.push(back.disasm_inst(inst));
+        let mut insts = asm.insts.clone();
+
+        while !insts.is_empty() {
+            let (used_insts, ir) = back.disasm_inst(&insts);
+            alloc_ir.push(ir);
+
+            for i in 0..used_insts {
+                insts.remove(i);
+            }
         }
 
         let mut deregalloc = DeRegAlloc::new(&alloc_ir);

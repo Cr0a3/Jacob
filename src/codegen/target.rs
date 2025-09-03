@@ -2,7 +2,7 @@ use std::any::Any;
 
 use crate::{
     codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation},
-    ir::TypeMetadata,
+    ir::{TypeMetadata, visibility::Visibilty},
 };
 
 /// The target architecture
@@ -60,15 +60,23 @@ pub trait Reg: Any + std::fmt::Debug {
 
     /// Returns the type of the register
     fn ty(&self) -> TypeMetadata;
+
+    /// Returns the register as an allocation
+    fn alloc(&self) -> Allocation {
+        Allocation::Register {
+            id: self.id(),
+            ty: self.ty(),
+        }
+    }
 }
 
 /// This trait is used to lower ir nodes into ir
 pub trait BackendInst {
     /// Lowers the given ir instruction
-    fn lower_inst(&self, ir: &AllocatedIrNode) -> AssemblyInst;
+    fn lower_inst(&self, ir: &AllocatedIrNode) -> Vec<AssemblyInst>;
 
     /// Gets the ir for the given assembly instruction
-    fn disasm_inst(&self, asm: &AssemblyInst) -> AllocatedIrNode;
+    fn disasm_inst(&self, asm: &[AssemblyInst]) -> (usize, AllocatedIrNode);
 }
 
 /// This trait is used to implement asm printing for the given architecture
@@ -77,7 +85,13 @@ pub trait AsmPrinter {
     fn print_compilation(&self, compilation: &Compilation) -> String {
         let mut out = self.print_comment("Compilation output");
 
+        out += self.print_code_section();
+
         for func in &compilation.funcs {
+            if func.scope == Visibilty::Public {
+                out += &format!("global {}\n", func.name);
+            }
+
             out += &self.print_func_name(&func.name);
             for inst in &func.insts {
                 out += &self.print_inst(inst);
@@ -116,5 +130,10 @@ pub trait AsmPrinter {
         }
 
         format!("\t{} {}\n", inst.opcode, ops)
+    }
+
+    /// Prints the start for a code section
+    fn print_code_section(&self) -> &'static str {
+        "section .text\n\n"
     }
 }

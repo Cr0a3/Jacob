@@ -1,4 +1,4 @@
-use crate::ir::{IrNode, operand::IrOperand, ty::TypeMetadata};
+use crate::ir::{IrNode, operand::IrOperand, ty::TypeMetadata, visibility::Visibilty};
 
 /// Saves the ir code for a function
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -9,10 +9,11 @@ pub struct Function {
     pub(crate) args: Vec<TypeMetadata>,
 
     pub(crate) ir: Vec<IrOperand>,
+    pub(crate) visibility: Visibilty,
 }
 
 impl Function {
-    /// Creates a new function
+    /// Creates a new (public) function
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_owned(),
@@ -20,7 +21,18 @@ impl Function {
             args: Vec::new(),
 
             ir: Vec::new(),
+            visibility: Visibilty::Public,
         }
+    }
+
+    /// Sets the visibility of the function to `Internal`
+    pub fn internal(&mut self) {
+        self.visibility = Visibilty::Internal;
+    }
+
+    /// Sets the visibility of the function to `Public`
+    pub fn public(&mut self) {
+        self.visibility = Visibilty::Public;
     }
 
     /// Sets the return type of the function
