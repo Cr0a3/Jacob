@@ -76,7 +76,7 @@ pub trait BackendInst {
     fn lower_inst(&self, ir: &AllocatedIrNode) -> Vec<AssemblyInst>;
 
     /// Gets the ir for the given assembly instruction
-    fn disasm_inst(&self, asm: &Vec<AssemblyInst>) -> (usize, AllocatedIrNode);
+    fn disasm_inst(&self, asm: &[AssemblyInst]) -> (usize, AllocatedIrNode);
 }
 
 /// This trait is used to implement asm printing for the given architecture

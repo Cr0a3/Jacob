@@ -8,7 +8,6 @@ use syn::{
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
-    token::Type,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -389,7 +388,7 @@ pub(crate) fn patterns_impl(input: TokenStream) -> TokenStream {
             }
         }
 
-        fn disasm_inst(&self, asm: &Vec<crate::codegen::AssemblyInst>) -> (usize, crate::codegen::AllocatedIrNode) {
+        fn disasm_inst(&self, asm: &[crate::codegen::AssemblyInst]) -> (usize, crate::codegen::AllocatedIrNode) {
             if asm.is_empty() {
                 panic!("Given assembly instructions are empty")
             }
