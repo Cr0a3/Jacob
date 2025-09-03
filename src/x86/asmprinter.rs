@@ -22,6 +22,10 @@ impl AsmPrinter for X86Backend {
         }
     }
 
+    fn print_comment(&self, text: &str) -> String {
+        format!("; {text}\n")
+    }
+
     #[allow(unreachable_patterns)]
     fn print_reg(&self, num: &usize, ty: &crate::ir::TypeMetadata) -> String {
         reg_printer!(num, ty, 0, "rax");

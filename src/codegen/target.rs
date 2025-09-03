@@ -2,7 +2,7 @@ use std::any::Any;
 
 use crate::{
     codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation},
-    ir::TypeMetadata,
+    ir::{TypeMetadata, visibility::Visibilty},
 };
 
 /// The target architecture
@@ -77,7 +77,13 @@ pub trait AsmPrinter {
     fn print_compilation(&self, compilation: &Compilation) -> String {
         let mut out = self.print_comment("Compilation output");
 
+        out += self.print_code_section();
+
         for func in &compilation.funcs {
+            if func.scope == Visibilty::Public {
+                out += &format!("global {}\n", func.name);
+            }
+
             out += &self.print_func_name(&func.name);
             for inst in &func.insts {
                 out += &self.print_inst(inst);
@@ -116,5 +122,10 @@ pub trait AsmPrinter {
         }
 
         format!("\t{} {}\n", inst.opcode, ops)
+    }
+
+    /// Prints the start for a code section
+    fn print_code_section(&self) -> &'static str {
+        "section .text\n\n"
     }
 }

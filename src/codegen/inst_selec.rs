@@ -1,17 +1,22 @@
-use crate::codegen::{AllocatedIrNode, ArchBackend, AssemblyInst};
+use crate::{
+    codegen::{AllocatedIrNode, ArchBackend, AssemblyInst},
+    ir::visibility::Visibilty,
+};
 
 /// Stores the assembly for a function
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FuncAsm {
     pub(crate) insts: Vec<AssemblyInst>,
     pub(crate) name: String,
+    pub(crate) scope: Visibilty,
 }
 impl FuncAsm {
     /// Creates a new instance
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, scope: &Visibilty) -> Self {
         Self {
             insts: Vec::new(),
             name,
+            scope: *scope,
         }
     }
 

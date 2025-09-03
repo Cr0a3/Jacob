@@ -83,7 +83,7 @@ impl Module {
         let backend = target.backend();
 
         for func in &self.funcs {
-            let mut asm = FuncAsm::new(func.name.to_owned());
+            let mut asm = FuncAsm::new(func.name.to_owned(), &func.visibility);
 
             let mut dropper = codegen::Dropper::new(func.ir.clone());
             dropper.run();

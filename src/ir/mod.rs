@@ -10,6 +10,8 @@ pub mod node;
 pub mod operand;
 /// Types
 pub mod ty;
+/// Visibilty
+pub mod visibility;
 
 pub use function::*;
 pub use module::*;

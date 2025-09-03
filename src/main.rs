@@ -15,6 +15,7 @@ fn main() {
     let mut module = Module::new();
 
     let mut func = Function::new("add");
+    func.public();
 
     let x = func.add_arg(ir::TypeMetadata::Int64);
     let y = func.add_arg(ir::TypeMetadata::Int64);
