@@ -1,15 +1,12 @@
-//! Code Generation library experiment
+/*
 
-#![forbid(missing_docs)]
-#![forbid(non_snake_case)]
+This file is an example on how to use the low level ir
+for building a simple add function and compilation
 
-use crate::ir::{Function, Module};
+*/
 
-pub mod codegen;
-pub mod decompile;
-pub mod ir;
-pub mod opt;
-pub mod x86;
+use jacob::ir::{Function, Module};
+use jacob::*;
 
 fn main() {
     let mut module = Module::new();
