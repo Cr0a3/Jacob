@@ -6,9 +6,12 @@ use crate::{
 /// Stores the assembly for a function
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FuncAsm {
-    pub(crate) insts: Vec<AssemblyInst>,
-    pub(crate) name: String,
-    pub(crate) scope: Visibilty,
+    /// The instructions of the function
+    pub insts: Vec<AssemblyInst>,
+    /// The name of the function
+    pub name: String,
+    /// The visibility of the function
+    pub scope: Visibilty,
 }
 impl FuncAsm {
     /// Creates a new instance
@@ -20,8 +23,8 @@ impl FuncAsm {
         }
     }
 
-    pub(crate) fn add(&mut self, inst: &Vec<AssemblyInst>) {
-        self.insts.extend_from_slice(&inst);
+    pub(crate) fn add(&mut self, inst: &[AssemblyInst]) {
+        self.insts.extend_from_slice(inst);
     }
 }
 

@@ -1,0 +1,31 @@
+/*
+
+This file is an example on how to use the low level api
+for disassembly (not reconmmended)
+
+*/
+
+use jacob::codegen::{AssemblyInst, Compilation, FuncAsm, Reg, TargetArch};
+use jacob::ir::visibility::Visibilty;
+use jacob::ir::{Function, Module};
+use jacob::x86::regs::{RAX, RDI, RSI};
+use jacob::*;
+
+fn main() {
+    let compilation = Compilation {
+        funcs: vec![FuncAsm {
+            insts: vec![
+                AssemblyInst::with3("lea", &RAX.alloc(), &RDI.alloc(), &RSI.alloc()),
+                AssemblyInst::with0("ret"),
+            ],
+            name: "add".to_owned(),
+            scope: Visibilty::Public,
+        }],
+        arch: TargetArch::X86,
+    };
+
+    let module = Module::decompile_comp(compilation);
+    for func in &module.funcs {
+        println!("{:#?}", func);
+    }
+}

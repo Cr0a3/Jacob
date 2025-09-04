@@ -1,12 +1,13 @@
 //! The x86 backend
 
 use crate::{
-    codegen::{Allocation, ArchBackend, Reg},
+    codegen::{Allocation, ArchBackend, BackendDecompiler, Reg},
     ir::TypeMetadata,
     x86::regs::*,
 };
 
 /// The registers to use in x86
+#[allow(dead_code)]
 pub mod regs;
 
 mod asmprinter;
@@ -62,5 +63,27 @@ impl ArchBackend for X86Backend {
         }
 
         Allocation::Stack { slot: num - 5, ty }
+    }
+}
+
+impl BackendDecompiler for X86Backend {
+    fn num_for_arg(&self, op: &Allocation) -> usize {
+        if let Allocation::Register { id, .. } = op {
+            return match *id {
+                RDI_ID => 0,
+                RSI_ID => 1,
+                RCX_ID => 2,
+                RDX_ID => 3,
+                R8_ID => 4,
+                R9_ID => 5,
+                _ => panic!("Given register (id: {id}) cannot be an argument"),
+            };
+        }
+
+        if let Allocation::Stack { slot, .. } = op {
+            return *slot + 5;
+        }
+
+        panic!()
     }
 }
