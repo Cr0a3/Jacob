@@ -54,6 +54,8 @@ impl DecompilationHelper {
         let mut deregalloc = DeRegAlloc::new(&alloc_ir, *target);
         deregalloc.dealloc();
 
+        eprintln!("{:#?}", deregalloc.ir()); // ToDo: remove log
+
         let mut ty_extractor = TypeExtractor::new(deregalloc.ir());
         ty_extractor.extract();
 

@@ -8,7 +8,8 @@ use crate::{
 
 /// Includes multiple functions and easy access to optimizations/compilation
 pub struct Module {
-    funcs: Vec<Function>,
+    /// The functions of the module
+    pub funcs: Vec<Function>,
     registered_opts: HashMap<TypeId, Box<dyn Optimization>>,
 
     opts_to_run: Vec<TypeId>,
