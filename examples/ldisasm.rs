@@ -6,10 +6,9 @@ for disassembly (not reconmmended)
 */
 
 use jacob::codegen::{AssemblyInst, Compilation, FuncAsm, Reg, TargetArch};
+use jacob::ir::Module;
 use jacob::ir::visibility::Visibilty;
-use jacob::ir::{Function, Module};
 use jacob::x86::regs::{RAX, RDI, RSI};
-use jacob::*;
 
 fn main() {
     let compilation = Compilation {
