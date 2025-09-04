@@ -74,11 +74,16 @@ impl Module {
         self.opts_to_run.clear();
     }
 
+    /// Runs dead code elimination on the module without requiring the optimization pipeline
+    pub(crate) fn dce(&mut self) {
+        for func in &mut self.funcs {
+            (Dce {}).run(func);
+        }
+    }
+
     /// Compiles the module
     pub fn compile(&mut self, target: TargetArch) -> Compilation {
-        self.add_opt::<Dce>();
-        self.run_opts();
-        self.clear_opts();
+        self.dce();
 
         let mut result = Compilation::new(target);
         let backend = target.backend();

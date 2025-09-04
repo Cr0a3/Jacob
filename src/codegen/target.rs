@@ -37,6 +37,9 @@ pub trait ArchBackend: Any + BackendInst + AsmPrinter + BackendDecompiler {
 
     /// Returns the position for an argument
     fn callconv_argpos(&self, num: usize, ty: TypeMetadata) -> Allocation;
+
+    /// Returns the return register
+    fn ret_reg(&self) -> Allocation;
 }
 
 /// The trait to implement for defining custom register

@@ -64,6 +64,10 @@ impl ArchBackend for X86Backend {
 
         Allocation::Stack { slot: num - 5, ty }
     }
+
+    fn ret_reg(&self) -> Allocation {
+        RAX.alloc()
+    }
 }
 
 impl BackendDecompiler for X86Backend {

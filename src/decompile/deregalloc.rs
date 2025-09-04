@@ -2,7 +2,7 @@ use std::{cell::RefCell, collections::HashMap, rc::Rc};
 
 use crate::{
     codegen::{AllocatedIrNode, Allocation, TargetArch},
-    ir::{IrNode, IrOperand},
+    ir::{IrNode, IrOpcode, IrOperand},
 };
 
 /// This helper structure is used to reverse enginner a list of
@@ -39,6 +39,12 @@ impl<'a> DeRegAlloc<'a> {
                 has_out: inst.has_out,
                 ty: inst.ty,
             };
+
+            if inst.opcode == IrOpcode::Ret // ToDo: won't work for good returns
+                && let Some(op) = self.inst_map.get(&back.ret_reg())
+            {
+                node.ops.push(op.to_owned());
+            }
 
             for op in &inst.ops {
                 if let Some(operand) = self.inst_map.get(op) {

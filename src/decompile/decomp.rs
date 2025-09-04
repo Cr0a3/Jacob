@@ -31,6 +31,8 @@ impl DecompilationHelper {
         for func in &self.asm.funcs {
             module.add_func(self.add_func(func, &self.asm.arch));
         }
+
+        module.dce();
     }
 
     /// Parses the function assembly of the given `FuncAsm` and returns an ir `Function`
