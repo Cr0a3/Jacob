@@ -16,6 +16,14 @@ pub enum IrOperand {
         /// The type
         ty: TypeMetadata,
     },
+    /// A constant number
+    ConstNum {
+        /// The number
+        num: usize,
+        /// The type
+        ty: TypeMetadata,
+    },
+
     /// The output of a previous instruction
     Out(Rc<RefCell<IrNode>>),
 
@@ -28,6 +36,7 @@ impl IrOperand {
     pub fn get_ty(&self) -> TypeMetadata {
         match self {
             IrOperand::Arg { num: _, ty } => *ty,
+            IrOperand::ConstNum { num: _, ty } => *ty,
             IrOperand::Out(ref_cell) => ref_cell.borrow().get_ty().expect("Expected type"),
             IrOperand::Drop(ref_cell) => ref_cell.get_ty(),
         }

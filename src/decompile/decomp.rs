@@ -1,7 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
-    codegen::{Compilation, FuncAsm},
+    codegen::{Compilation, FuncAsm, TargetArch},
     decompile::{deregalloc::DeRegAlloc, type_extractor::TypeExtractor},
     ir::{Function, IrOperand, Module},
 };
@@ -29,12 +29,12 @@ impl DecompilationHelper {
     /// Parses the functions and inserts them into the module
     pub fn add_funcs(&self, module: &mut Module) {
         for func in &self.asm.funcs {
-            module.add_func(self.add_func(func));
+            module.add_func(self.add_func(func, &self.asm.arch));
         }
     }
 
     /// Parses the function assembly of the given `FuncAsm` and returns an ir `Function`
-    pub fn add_func(&self, asm: &FuncAsm) -> Function {
+    pub fn add_func(&self, asm: &FuncAsm, target: &TargetArch) -> Function {
         let mut func = Function::new(&asm.name);
 
         let back = self.asm.arch.backend();
@@ -51,7 +51,7 @@ impl DecompilationHelper {
             }
         }
 
-        let mut deregalloc = DeRegAlloc::new(&alloc_ir);
+        let mut deregalloc = DeRegAlloc::new(&alloc_ir, *target);
         deregalloc.dealloc();
 
         let mut ty_extractor = TypeExtractor::new(deregalloc.ir());

@@ -22,7 +22,7 @@ impl TargetArch {
 }
 
 /// The trait to implement when defining the backend for a custom architecture
-pub trait ArchBackend: Any + BackendInst + AsmPrinter {
+pub trait ArchBackend: Any + BackendInst + AsmPrinter + BackendDecompiler {
     /// Returns the name of the backend
     fn name(&self) -> &'static str;
 
@@ -136,4 +136,10 @@ pub trait AsmPrinter {
     fn print_code_section(&self) -> &'static str {
         "section .text\n\n"
     }
+}
+
+/// Trait to help with target specific decompilation stuff
+pub trait BackendDecompiler {
+    /// Returns the number for the given argument for the given position
+    fn num_for_arg(&self, op: &Allocation) -> usize;
 }

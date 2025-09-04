@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// The resource to use for an allocation
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Allocation {
     /// The register to use
     Register {
@@ -20,6 +20,13 @@ pub enum Allocation {
         /// The slot
         slot: usize,
         /// Type to store
+        ty: TypeMetadata,
+    },
+    /// A constant number
+    Imm {
+        /// The number
+        num: usize,
+        /// The type
         ty: TypeMetadata,
     },
 }
@@ -40,7 +47,7 @@ impl Allocation {
     /// Returns if it's a constant int
     #[inline]
     pub fn is_imm(&self) -> bool {
-        false
+        matches!(self, Allocation::Imm { .. })
     }
 
     /// Returns the type of the allocation (not Register/Stack but Int64 for example)
@@ -48,6 +55,7 @@ impl Allocation {
         match self {
             Allocation::Register { id: _, ty } => *ty,
             Allocation::Stack { slot: _, ty } => *ty,
+            Allocation::Imm { num: _, ty } => *ty,
         }
     }
 
@@ -57,29 +65,6 @@ impl Allocation {
     pub(crate) fn is_any(&self) -> bool {
         true
     }
-}
-
-/// same as `src/ir/operand.rs - IrOperand` but with a allocated dest
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AllocatedIrOperand {
-    /// Argument
-    Arg {
-        /// The number of the arg
-        num: usize,
-        /// The type
-        ty: TypeMetadata,
-        /// Allocation
-        alloc: Allocation,
-    },
-    /// The output of a previous instruction
-    Inst {
-        /// Opcode of the instruction
-        opcode: IrOpcode,
-        /// Allocation for output
-        alloc: Option<Allocation>,
-        /// Operands
-        ops: Vec<Allocation>,
-    },
 }
 
 /// same as `src/ir/node.rs - IrNode` but with a allocated dest
@@ -223,6 +208,7 @@ impl<'a> RegAlloc<'a> {
         match res {
             Allocation::Register { .. } => self.free_regs.push(res),
             Allocation::Stack { .. } => self.freed_mem.push(res),
+            Allocation::Imm { .. } => panic!("An imm must not be used as a target resource"),
         }
     }
 

@@ -19,6 +19,7 @@ impl AsmPrinter for X86Backend {
         match op {
             crate::codegen::Allocation::Register { id, ty } => self.print_reg(id, ty),
             crate::codegen::Allocation::Stack { slot, ty: _ } => format!("[rsp + {}]", slot * 16),
+            crate::codegen::Allocation::Imm { num, ty: _ } => format!("{num:x}"),
         }
     }
 

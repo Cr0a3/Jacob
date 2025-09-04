@@ -8,36 +8,52 @@ pub struct X86Reg {
 
 /// The rax register
 pub const RAX: X86Reg = X86Reg { id: 0 };
+pub(crate) const RAX_ID: usize = 0;
 /// The rcx register
 pub const RCX: X86Reg = X86Reg { id: 1 };
+pub(crate) const RCX_ID: usize = 1;
 /// The rdx register
 pub const RDX: X86Reg = X86Reg { id: 2 };
+pub(crate) const RDX_ID: usize = 2;
 /// The rbx register
 pub const RBX: X86Reg = X86Reg { id: 3 };
+pub(crate) const RBX_ID: usize = 3;
 /// The rsp register
 pub const RSP: X86Reg = X86Reg { id: 4 };
+pub(crate) const RSP_ID: usize = 4;
 /// The rbp register
 pub const RBP: X86Reg = X86Reg { id: 5 };
+pub(crate) const RBP_ID: usize = 5;
 /// The rsi register
 pub const RSI: X86Reg = X86Reg { id: 6 };
+pub(crate) const RSI_ID: usize = 6;
 /// The rdi register
 pub const RDI: X86Reg = X86Reg { id: 7 };
+pub(crate) const RDI_ID: usize = 7;
 /// The r8 register
 pub const R8: X86Reg = X86Reg { id: 8 };
+pub(crate) const R8_ID: usize = 8;
 /// The r9 register
 pub const R9: X86Reg = X86Reg { id: 9 };
+pub(crate) const R9_ID: usize = 9;
 /// The r10 register
 pub const R10: X86Reg = X86Reg { id: 10 };
+pub(crate) const R10_ID: usize = 10;
 /// The r11 register
 pub const R11: X86Reg = X86Reg { id: 11 };
+pub(crate) const R11_ID: usize = 11;
 /// The r12 register
 pub const R12: X86Reg = X86Reg { id: 12 };
+pub(crate) const R12_ID: usize = 12;
 /// The r13 register
 pub const R13: X86Reg = X86Reg { id: 13 };
+pub(crate) const R13_ID: usize = 13;
 /// The r14 register
 pub const R14: X86Reg = X86Reg { id: 14 };
+pub(crate) const R14_ID: usize = 14;
 /// The r15 register
 pub const R15: X86Reg = X86Reg { id: 15 };
+pub(crate) const R15_ID: usize = 15;
 
 impl Reg for X86Reg {
     fn id(&self) -> usize {

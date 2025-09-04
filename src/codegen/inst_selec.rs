@@ -20,8 +20,8 @@ impl FuncAsm {
         }
     }
 
-    pub(crate) fn add(&mut self, inst: &Vec<AssemblyInst>) {
-        self.insts.extend_from_slice(&inst);
+    pub(crate) fn add(&mut self, inst: &[AssemblyInst]) {
+        self.insts.extend_from_slice(inst);
     }
 }
 
