@@ -2,6 +2,9 @@
 
 /// Structures for storing assembly code
 pub mod asm;
+
+/// Trait implementations for printing an allocated ir node
+mod comment;
 /// Resource dropping
 pub mod dropper;
 /// Instruction selection

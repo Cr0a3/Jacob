@@ -62,3 +62,12 @@ impl AssemblyInst {
         Some(self.ops[0].get_ty())
     }
 }
+
+/// An assembly instruction with a comment
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CommentedInst {
+    /// The real instruction
+    pub insts: Vec<AssemblyInst>,
+    /// The comment
+    pub comment: String,
+}
