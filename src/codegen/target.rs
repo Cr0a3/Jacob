@@ -96,8 +96,20 @@ pub trait AsmPrinter {
             }
 
             out += &self.print_func_name(&func.name);
-            for inst in &func.insts {
-                out += &self.print_inst(inst);
+            if func.meta_insts.is_empty() {
+                for inst in &func.insts {
+                    out += &self.print_inst(inst);
+                }
+            } else {
+                for minst in &func.meta_insts {
+                    if !minst.comment.is_empty() {
+                        out += &self.print_comment(&minst.comment);
+                    }
+
+                    for inst in &minst.insts {
+                        out += &self.print_inst(inst);
+                    }
+                }
             }
         }
 

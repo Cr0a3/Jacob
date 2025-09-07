@@ -82,7 +82,16 @@ impl Module {
     }
 
     /// Compiles the module
-    pub fn compile(&mut self, target: TargetArch) -> Compilation {
+    ///
+    /// Args:
+    ///  - `target` the target to compile to
+    ///  - `rich_comments` should comments be inserted into the assembly code
+    ///
+    /// Example:
+    /// ```rust
+    /// module.compile(codegen::TargetArch::X86, false);
+    /// ```
+    pub fn compile(&mut self, target: TargetArch, rich_comments: bool) -> Compilation {
         self.dce();
 
         let mut result = Compilation::new(target);
@@ -97,7 +106,7 @@ impl Module {
             let mut regalloc = codegen::RegAlloc::new(func.args.clone(), &*backend);
             regalloc.run(dropper.get_ir());
 
-            let mut inst = codegen::InstSelector::new(regalloc.get_ir(), &*backend);
+            let mut inst = codegen::InstSelector::new(regalloc.get_ir(), &*backend, rich_comments);
             inst.run(&mut asm);
 
             result.add(asm);

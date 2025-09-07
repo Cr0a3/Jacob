@@ -17,6 +17,7 @@ fn main() {
                 AssemblyInst::with3("lea", &RAX.alloc(), &RDI.alloc(), &RSI.alloc()),
                 AssemblyInst::with0("ret"),
             ],
+            meta_insts: Vec::new(), // We can just leave this empty,
             name: "add".to_owned(),
             scope: Visibilty::Public,
         }],
