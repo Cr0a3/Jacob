@@ -1,60 +1,69 @@
-//! The x86 backend
+//! The aarch64 backend
 
 use crate::{
+    aarch64::regs::*,
     codegen::{Allocation, ArchBackend, BackendDecompiler, Reg},
-    ir::TypeMetadata,
-    x86::regs::*,
 };
-
-/// The registers to use in x86
-#[allow(dead_code)]
-pub mod regs;
 
 mod asmprinter;
 mod lowering;
 
-/// This structure defines the entire x86 backend
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct X86Backend {}
+/// The registers used in aarch64
+#[allow(dead_code)]
+pub mod regs;
 
-impl ArchBackend for X86Backend {
+/// The aarch64 backend
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Aarch64Backend {}
+
+impl ArchBackend for Aarch64Backend {
     fn name(&self) -> &'static str {
-        "x86"
+        "aarch64"
     }
 
     fn caller_gpr(&self) -> Vec<Box<dyn crate::codegen::Reg>> {
-        let regs: Vec<X86Reg> = vec![RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11];
+        let regs: Vec<Aarch64Reg> = vec![X0, X1, X2, X3, X4, X5, X6, X7];
         regs.iter()
             .map(|x| Box::new(*x) as Box<dyn crate::codegen::Reg>)
             .collect()
     }
 
     fn callee_gpr(&self) -> Vec<Box<dyn crate::codegen::Reg>> {
-        let regs: Vec<X86Reg> = vec![RBX, R12, R13, R14, R15];
-        regs.iter()
-            .map(|x| Box::new(*x) as Box<dyn crate::codegen::Reg>)
-            .collect()
-    }
-
-    fn grps(&self) -> Vec<Box<dyn crate::codegen::Reg>> {
-        let regs: Vec<X86Reg> = vec![
-            RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11, RBX, R12, R13, R14,
+        let regs: Vec<Aarch64Reg> = vec![
+            X8, X9, X10, X11, X12, X13, X14, X15, X16, X17, X18, X19, X20, X21, X22, X23, X24, X25,
+            X26, X27, X28,
         ];
         regs.iter()
             .map(|x| Box::new(*x) as Box<dyn crate::codegen::Reg>)
             .collect()
     }
 
-    fn callconv_argpos(&self, num: usize, ty: TypeMetadata) -> Allocation {
-        if num < 6 {
+    fn grps(&self) -> Vec<Box<dyn crate::codegen::Reg>> {
+        let regs: Vec<Aarch64Reg> = vec![
+            X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15, X16, X17, X18,
+            X19, X20, X21, X22, X23, X24, X25, X26, X27, X28,
+        ];
+        regs.iter()
+            .map(|x| Box::new(*x) as Box<dyn crate::codegen::Reg>)
+            .collect()
+    }
+
+    fn callconv_argpos(
+        &self,
+        num: usize,
+        ty: crate::ir::TypeMetadata,
+    ) -> crate::codegen::Allocation {
+        if num < 8 {
             return Allocation::Register {
                 id: match num {
-                    0 => RDI,
-                    1 => RSI,
-                    2 => RCX,
-                    3 => RDX,
-                    4 => R8,
-                    5 => R9,
+                    0 => X0,
+                    1 => X1,
+                    2 => X2,
+                    3 => X3,
+                    4 => X4,
+                    5 => X5,
+                    6 => X6,
+                    7 => X7,
                     _ => unreachable!(),
                 }
                 .id(),
@@ -65,21 +74,23 @@ impl ArchBackend for X86Backend {
         Allocation::Stack { slot: num - 5, ty } // ToDo: find out: why 5?
     }
 
-    fn ret_reg(&self) -> Allocation {
-        RAX.alloc()
+    fn ret_reg(&self) -> crate::codegen::Allocation {
+        X0.alloc()
     }
 }
 
-impl BackendDecompiler for X86Backend {
+impl BackendDecompiler for Aarch64Backend {
     fn num_for_arg(&self, op: &Allocation) -> usize {
         if let Allocation::Register { id, .. } = op {
             return match *id {
-                RDI_ID => 0,
-                RSI_ID => 1,
-                RCX_ID => 2,
-                RDX_ID => 3,
-                R8_ID => 4,
-                R9_ID => 5,
+                X0_ID => 0,
+                X1_ID => 1,
+                X2_ID => 2,
+                X3_ID => 3,
+                X4_ID => 4,
+                X5_ID => 5,
+                X6_ID => 6,
+                X7_ID => 7,
                 _ => panic!("Given register (id: {id}) cannot be an argument"),
             };
         }
