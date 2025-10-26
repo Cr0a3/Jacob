@@ -29,6 +29,11 @@ pub enum Allocation {
         /// The type
         ty: TypeMetadata,
     },
+    /// Ptr to a constant
+    ConstUse {
+        /// The id of the constant
+        id: usize,
+    },
 }
 
 impl Allocation {
@@ -56,6 +61,7 @@ impl Allocation {
             Allocation::Register { id: _, ty } => *ty,
             Allocation::Stack { slot: _, ty } => *ty,
             Allocation::Imm { num: _, ty } => *ty,
+            Allocation::ConstUse { .. } => TypeMetadata::Int64, // it's a pointer
         }
     }
 
@@ -209,6 +215,7 @@ impl<'a> RegAlloc<'a> {
             Allocation::Register { .. } => self.free_regs.push(res),
             Allocation::Stack { .. } => self.freed_mem.push(res),
             Allocation::Imm { .. } => panic!("An imm must not be used as a target resource"),
+            Allocation::ConstUse { .. } => panic!("A ptr cannot be freed"),
         }
     }
 

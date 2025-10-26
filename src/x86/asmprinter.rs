@@ -20,6 +20,7 @@ impl AsmPrinter for X86Backend {
             crate::codegen::Allocation::Register { id, ty } => self.print_reg(id, ty),
             crate::codegen::Allocation::Stack { slot, ty: _ } => format!("[rsp + {}]", slot * 16),
             crate::codegen::Allocation::Imm { num, ty: _ } => format!("{num:x}"),
+            crate::codegen::Allocation::ConstUse { id } => format!("[c{id}]"),
         }
     }
 
@@ -69,5 +70,9 @@ impl AsmPrinter for X86Backend {
         }
 
         format!("\t{} {}\n", inst.opcode, ops)
+    }
+
+    fn print_const(&self, c: &crate::codegen::Constant) -> String {
+        format!("c{}: {:?}", c.id, c.bytes)
     }
 }

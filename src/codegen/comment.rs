@@ -28,6 +28,7 @@ impl Display for Allocation {
             Allocation::Register { id, .. } => write!(f, "reg({id})"),
             Allocation::Stack { slot, .. } => write!(f, "stack({slot})"),
             Allocation::Imm { num, .. } => write!(f, "{num}"),
+            Allocation::ConstUse { id, .. } => write!(f, "const_ptr({id})"),
         }
     }
 }
