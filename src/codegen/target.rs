@@ -1,7 +1,7 @@
 use std::any::Any;
 
 use crate::{
-    codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation},
+    codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation, Constant},
     ir::{TypeMetadata, visibility::Visibilty},
 };
 
@@ -91,6 +91,10 @@ pub trait AsmPrinter {
         out += self.print_code_section();
 
         for func in &compilation.funcs {
+            for c in &func.consts {
+                out += &self.print_const(c);
+            }
+
             if func.scope == Visibilty::Public {
                 out += &format!("global {}\n", func.name);
             }
@@ -151,6 +155,9 @@ pub trait AsmPrinter {
     fn print_code_section(&self) -> &'static str {
         "section .text\n\n"
     }
+
+    /// Prints a constant
+    fn print_const(&self, c: &Constant) -> String;
 }
 
 /// Trait to help with target specific decompilation stuff
