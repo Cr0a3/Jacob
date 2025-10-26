@@ -10,6 +10,8 @@ use crate::{
 pub enum TargetArch {
     /// 64Bit x86
     X86,
+    /// 64Bit arm
+    Aarch64,
 }
 
 impl TargetArch {
@@ -17,6 +19,7 @@ impl TargetArch {
     pub fn backend(&self) -> Box<dyn ArchBackend> {
         match self {
             TargetArch::X86 => Box::new(crate::x86::X86Backend {}),
+            TargetArch::Aarch64 => Box::new(crate::aarch64::Aarch64Backend {}),
         }
     }
 }
