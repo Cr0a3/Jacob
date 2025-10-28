@@ -58,4 +58,12 @@ impl AsmPrinter for Aarch64Backend {
     fn print_const(&self, c: &crate::codegen::Constant) -> String {
         format!("c{}: {:?}", c.id, c.bytes)
     }
+
+    fn print_code_section(&self) -> &'static str {
+        ".text\n"
+    }
+
+    fn print_global(&self, func: &String) -> String {
+        format!(".global {}\n", func)
+    }
 }

@@ -99,7 +99,7 @@ pub trait AsmPrinter {
             }
 
             if func.scope == Visibilty::Public {
-                out += &format!("global {}\n", func.name);
+                out += &self.print_global(&func.name);
             }
 
             out += &self.print_func_name(&func.name);
@@ -161,6 +161,11 @@ pub trait AsmPrinter {
 
     /// Prints a constant
     fn print_const(&self, c: &Constant) -> String;
+
+    /// Prints out the global visibility specifier
+    fn print_global(&self, func: &String) -> String {
+        format!("global {}", func)
+    }
 }
 
 /// Trait to help with target specific decompilation stuff
