@@ -22,7 +22,7 @@ fn main() {
 
     module.add_func(func);
 
-    let asm = module.compile(codegen::TargetArch::X86, false);
+    let asm = module.compile(codegen::TargetArch::Aarch64, false);
 
     println!("{}", asm.asm());
 }

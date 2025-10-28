@@ -8,3 +8,4 @@ pub mod decompile;
 pub mod ir;
 pub mod opt;
 pub mod x86;
+pub mod aarch64;

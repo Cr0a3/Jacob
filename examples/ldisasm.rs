@@ -20,6 +20,7 @@ fn main() {
             meta_insts: Vec::new(), // We can just leave this empty,
             name: "add".to_owned(),
             scope: Visibilty::Public,
+            consts: Vec::new(),
         }],
         arch: TargetArch::X86,
     };
