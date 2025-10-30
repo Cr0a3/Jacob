@@ -12,6 +12,8 @@ pub enum TargetArch {
     X86,
     /// 64Bit arm
     Aarch64,
+    /// 64Bit riscv
+    Riscv64,
 }
 
 impl TargetArch {
@@ -20,6 +22,7 @@ impl TargetArch {
         match self {
             TargetArch::X86 => Box::new(crate::x86::X86Backend {}),
             TargetArch::Aarch64 => Box::new(crate::aarch64::Aarch64Backend {}),
+            TargetArch::Riscv64 => Box::new(crate::riscv64::Riscv64Backend {}),
         }
     }
 }
