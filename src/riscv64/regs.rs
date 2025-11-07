@@ -81,6 +81,9 @@ pub(crate) const T6_ID: usize = 23;
 /// The t7 register
 pub const T7: Riscv64Reg = Riscv64Reg { id: 24 };
 pub(crate) const T7_ID: usize = 24;
+/// The sp register
+pub const SP: Riscv64Reg = Riscv64Reg { id: 25 };
+pub(crate) const SP_ID: usize = 25;
 
 impl Reg for Riscv64Reg {
     fn id(&self) -> usize {
@@ -118,12 +121,13 @@ impl Reg for Riscv64Reg {
             val if val == T5.id() => "t5",
             val if val == T6.id() => "t6",
             val if val == T7.id() => "t7",
+            val if val == SP.id() => "sp",
             _ => panic!(),
         }
     }
 
     fn is_gpr(&self) -> bool {
-        true
+        !matches!(self.id, SP_ID)
     }
 
     fn caller_saved(&self) -> bool {

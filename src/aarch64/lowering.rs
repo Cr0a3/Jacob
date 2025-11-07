@@ -2,7 +2,7 @@ use procmacro::patterns;
 
 use crate::{
     aarch64::{Aarch64Backend, regs::X0},
-    codegen::{BackendInst, Reg},
+    codegen::{BackendInst, InstrincLowering, Reg},
 };
 
 impl BackendInst for Aarch64Backend {
@@ -19,5 +19,10 @@ impl BackendInst for Aarch64Backend {
             asm: mov(X0.alloc(), in1)
             asm: ret()
         }
+        Copy(Gr) -> Gr {
+            asm: mov (out, in1)
+        }
     }
 }
+
+impl InstrincLowering for Aarch64Backend {}

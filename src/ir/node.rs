@@ -4,7 +4,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::ir::{operand::IrOperand, ty::TypeMetadata};
+use crate::ir::{InstrincSettings, operand::IrOperand, ty::TypeMetadata};
 
 /// The opcode of the node
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,6 +15,10 @@ pub enum IrOpcode {
     Sub,
     /// Returns to the caller
     Ret,
+    /// Copys one value to another register
+    Copy,
+    /// Calls an instrinc
+    InstrincCall(InstrincSettings),
 }
 
 /// An ir node
@@ -41,14 +45,14 @@ macro_rules! op2 {
     };
 }
 macro_rules! op1 {
-    ($name:tt, $opcode:expr) => {
+    ($name:tt, $opcode:expr, $out:tt) => {
         /// Creates the node
         pub fn $name(op: &IrOperand) -> IrOperand {
             let ty = op.get_ty();
             IrOperand::Out(Rc::new(RefCell::new(IrNode {
                 opcode: $opcode,
                 ops: vec![op.clone()],
-                has_out: true,
+                has_out: $out,
                 ty: Some(ty),
             })))
         }
@@ -58,7 +62,18 @@ macro_rules! op1 {
 impl IrNode {
     op2!(add, IrOpcode::Add);
     op2!(sub, IrOpcode::Sub);
-    op1!(ret, IrOpcode::Ret);
+    op1!(ret, IrOpcode::Ret, false);
+    op1!(copy, IrOpcode::Copy, true);
+
+    /// Creates a new get stack pointer instrinc
+    pub fn get_stack_ptr() -> IrOperand {
+        IrOperand::Out(Rc::new(RefCell::new(IrNode {
+            opcode: IrOpcode::InstrincCall(InstrincSettings::get_stack_ptr()),
+            ops: Vec::new(),
+            has_out: true,
+            ty: Some(TypeMetadata::Int64),
+        })))
+    }
 
     /// Returns the type of the node
     pub fn get_ty(&self) -> Option<TypeMetadata> {
@@ -78,6 +93,16 @@ impl IrNode {
     /// Returns if the instruction has the `ret` opcode
     pub fn is_ret(&self) -> bool {
         matches!(self.opcode, IrOpcode::Ret)
+    }
+
+    /// Returns if the instruction has the `copy` opcode
+    pub fn is_copy(&self) -> bool {
+        matches!(self.opcode, IrOpcode::Copy)
+    }
+
+    /// Returns if the instruction is an instrinc
+    pub fn is_instrinc(&self) -> bool {
+        matches!(self.opcode, IrOpcode::InstrincCall(_))
     }
 
     /// Gets the first operand (be carful, if there are no operands, this function will panic!)

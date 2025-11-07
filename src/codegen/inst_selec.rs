@@ -1,6 +1,6 @@
 use crate::{
     codegen::{AllocatedIrNode, ArchBackend, AssemblyInst, CommentedInst},
-    ir::visibility::Visibilty,
+    ir::{IrOpcode, visibility::Visibilty},
 };
 
 /// Stores the assembly for a function
@@ -74,7 +74,11 @@ impl<'a, 'b> InstSelector<'a, 'b> {
     /// Runs the register selector
     pub fn run(&mut self, funcasm: &mut FuncAsm) {
         for ir_inst in self.ir {
-            let inst = self.backend.lower_inst(ir_inst);
+            let inst = if matches!(ir_inst.opcode, IrOpcode::InstrincCall(_)) {
+                self.backend.lower_instrinc(ir_inst)
+            } else {
+                self.backend.lower_inst(ir_inst)
+            };
             funcasm.add(&inst);
 
             if self.rich_commenting {

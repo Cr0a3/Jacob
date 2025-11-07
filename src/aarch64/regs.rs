@@ -93,6 +93,9 @@ pub(crate) const X27_ID: usize = 27;
 /// The x28 register
 pub const X28: Aarch64Reg = Aarch64Reg { id: 28 };
 pub(crate) const X28_ID: usize = 28;
+/// The sp register
+pub const SP: Aarch64Reg = Aarch64Reg { id: 29 };
+pub(crate) const SP_ID: usize = 29;
 
 impl Reg for Aarch64Reg {
     fn id(&self) -> usize {
@@ -134,15 +137,16 @@ impl Reg for Aarch64Reg {
             val if val == X26.id() => "x26",
             val if val == X27.id() => "x27",
             val if val == X28.id() => "x28",
+            val if val == SP.id() => "sp",
             _ => panic!(),
         }
     }
 
     fn is_gpr(&self) -> bool {
-        true
+        !matches!(self.id, SP_ID)
     }
 
     fn caller_saved(&self) -> bool {
-        self.id <= 7
+        self.id <= 7 && self.id != SP_ID
     }
 }

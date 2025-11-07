@@ -52,7 +52,8 @@ impl AsmPrinter for Aarch64Backend {
         reg_printer!(num, ty, 26, "x26");
         reg_printer!(num, ty, 27, "x27");
         reg_printer!(num, ty, 28, "x28");
-        panic!("Impossible register id: {num}. Aarch64 supports 0-28");
+        reg_printer!(num, ty, 29, "sp");
+        panic!("Impossible register id: {num}. Aarch64 supports 0-29");
     }
 
     fn print_const(&self, c: &crate::codegen::Constant) -> String {

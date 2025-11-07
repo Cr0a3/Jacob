@@ -2,7 +2,7 @@ use std::any::Any;
 
 use crate::{
     codegen::{AllocatedIrNode, Allocation, AssemblyInst, Compilation, Constant},
-    ir::{TypeMetadata, visibility::Visibilty},
+    ir::{InstrincSettings, InstrincType, IrOpcode, TypeMetadata, visibility::Visibilty},
 };
 
 /// The target architecture
@@ -28,7 +28,13 @@ impl TargetArch {
 }
 
 /// The trait to implement when defining the backend for a custom architecture
-pub trait ArchBackend: Any + BackendInst + AsmPrinter + BackendDecompiler {
+pub trait ArchBackend:
+    Any + ArchInfos + BackendInst + AsmPrinter + BackendDecompiler + InstrincLowering
+{
+}
+
+/// The trait to implement when defining informations for the backend for a custom architecture
+pub trait ArchInfos {
     /// Returns the name of the backend
     fn name(&self) -> &'static str;
 
@@ -46,6 +52,9 @@ pub trait ArchBackend: Any + BackendInst + AsmPrinter + BackendDecompiler {
 
     /// Returns the return register
     fn ret_reg(&self) -> Allocation;
+
+    /// Returns the stack pointer
+    fn get_stack_ptr(&self) -> Allocation;
 }
 
 /// The trait to implement for defining custom register
@@ -86,6 +95,41 @@ pub trait BackendInst {
 
     /// Gets the ir for the given assembly instruction
     fn disasm_inst(&self, asm: &[AssemblyInst]) -> (usize, AllocatedIrNode);
+}
+
+/// This trait is used to lower instrincs
+pub trait InstrincLowering: BackendInst + ArchInfos {
+    /// Lowers the given instrinc
+    fn lower_instrinc(&self, node: &AllocatedIrNode) -> Vec<AssemblyInst> {
+        let IrOpcode::InstrincCall(settings) = &node.opcode else {
+            return Vec::new();
+        };
+
+        match settings.instrinc {
+            InstrincType::GetStackPointer => self.lower_get_stp(
+                settings,
+                node,
+                node.alloc
+                    .expect("An output is mandatory for the get stack pointer instrinc"),
+            ),
+        }
+    }
+
+    /// Lowers the get stack pointer instrinc
+    fn lower_get_stp(
+        &self,
+        _settings: &InstrincSettings,
+        node: &AllocatedIrNode,
+        out: Allocation,
+    ) -> Vec<AssemblyInst> {
+        self.lower_inst(&AllocatedIrNode {
+            opcode: IrOpcode::Copy,
+            ops: vec![self.get_stack_ptr()],
+            has_out: true,
+            ty: node.ty,
+            alloc: Some(out),
+        })
+    }
 }
 
 /// This trait is used to implement asm printing for the given architecture

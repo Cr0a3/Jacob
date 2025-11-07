@@ -1,7 +1,7 @@
 //! The riscv64 backend
 
 use crate::{
-    codegen::{Allocation, ArchBackend, BackendDecompiler, Reg},
+    codegen::{Allocation, ArchBackend, ArchInfos, BackendDecompiler, Reg},
     riscv64::regs::*,
 };
 
@@ -16,7 +16,9 @@ pub mod regs;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Riscv64Backend {}
 
-impl ArchBackend for Riscv64Backend {
+impl ArchBackend for Riscv64Backend {}
+
+impl ArchInfos for Riscv64Backend {
     fn name(&self) -> &'static str {
         "riscv64"
     }
@@ -71,8 +73,12 @@ impl ArchBackend for Riscv64Backend {
         Allocation::Stack { slot: num - 5, ty } // ToDo: find out: why 5?
     }
 
-    fn ret_reg(&self) -> crate::codegen::Allocation {
+    fn ret_reg(&self) -> Allocation {
         A0.alloc()
+    }
+
+    fn get_stack_ptr(&self) -> Allocation {
+        SP.alloc()
     }
 }
 

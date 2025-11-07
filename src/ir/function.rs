@@ -67,4 +67,18 @@ impl Function {
     pub fn ret(&mut self, op: &IrOperand) {
         self.ir.push(IrNode::ret(op));
     }
+
+    /// Copys the value from one register to another
+    pub fn copy(&mut self, op: &IrOperand) -> IrOperand {
+        let node = IrNode::copy(op);
+        self.ir.push(node.to_owned());
+        node
+    }
+
+    /// Gets the stack pointer
+    pub fn get_sp(&mut self) -> IrOperand {
+        let node = IrNode::get_stack_ptr();
+        self.ir.push(node.to_owned());
+        node
+    }
 }

@@ -2,6 +2,8 @@
 
 /// Function
 pub mod function;
+/// Instrincs
+pub mod instrinc;
 /// Compilation unit
 pub mod module;
 /// Ir nodes
@@ -14,6 +16,7 @@ pub mod ty;
 pub mod visibility;
 
 pub use function::*;
+pub use instrinc::*;
 pub use module::*;
 pub use node::*;
 pub use operand::*;
