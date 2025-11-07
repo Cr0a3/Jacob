@@ -43,12 +43,13 @@ impl AsmPrinter for Riscv64Backend {
         reg_printer!(num, ty, 17, "s11");
         reg_printer!(num, ty, 18, "t1");
         reg_printer!(num, ty, 20, "t2");
-        reg_printer!(num, ty, 19, "t3");
-        reg_printer!(num, ty, 22, "t4");
-        reg_printer!(num, ty, 21, "t5");
-        reg_printer!(num, ty, 24, "t6");
-        reg_printer!(num, ty, 23, "t7");
-        panic!("Impossible register id: {num}. RiscV supports 0-23");
+        reg_printer!(num, ty, 20, "t3");
+        reg_printer!(num, ty, 21, "t4");
+        reg_printer!(num, ty, 22, "t5");
+        reg_printer!(num, ty, 23, "t6");
+        reg_printer!(num, ty, 24, "t7");
+        reg_printer!(num, ty, 25, "sp");
+        panic!("Impossible register id: {num}. RiscV supports 0-25");
     }
 
     fn print_const(&self, c: &crate::codegen::Constant) -> String {

@@ -1,7 +1,7 @@
 //! The x86 backend
 
 use crate::{
-    codegen::{Allocation, ArchBackend, BackendDecompiler, Reg},
+    codegen::{Allocation, ArchBackend, ArchInfos, BackendDecompiler, Reg},
     ir::TypeMetadata,
     x86::regs::*,
 };
@@ -17,7 +17,9 @@ mod lowering;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct X86Backend {}
 
-impl ArchBackend for X86Backend {
+impl ArchBackend for X86Backend {}
+
+impl ArchInfos for X86Backend {
     fn name(&self) -> &'static str {
         "x86"
     }
@@ -67,6 +69,10 @@ impl ArchBackend for X86Backend {
 
     fn ret_reg(&self) -> Allocation {
         RAX.alloc()
+    }
+
+    fn get_stack_ptr(&self) -> Allocation {
+        RSP.alloc()
     }
 }
 

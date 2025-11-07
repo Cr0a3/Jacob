@@ -1,7 +1,7 @@
 use procmacro::patterns;
 
 use crate::{
-    codegen::{BackendInst, Reg},
+    codegen::{BackendInst, InstrincLowering, Reg},
     x86::{X86Backend, regs::RAX},
 };
 
@@ -28,5 +28,10 @@ impl BackendInst for X86Backend {
             asm: mov(RAX.alloc(), in1)
             asm: ret()
         }
+        Copy(Gr) -> Gr {
+            asm: mov (out, in1)
+        }
     }
 }
+
+impl InstrincLowering for X86Backend {}

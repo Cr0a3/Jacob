@@ -2,7 +2,7 @@
 
 use crate::{
     aarch64::regs::*,
-    codegen::{Allocation, ArchBackend, BackendDecompiler, Reg},
+    codegen::{Allocation, ArchBackend, ArchInfos, BackendDecompiler, Reg},
 };
 
 mod asmprinter;
@@ -16,7 +16,9 @@ pub mod regs;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Aarch64Backend {}
 
-impl ArchBackend for Aarch64Backend {
+impl ArchBackend for Aarch64Backend {}
+
+impl ArchInfos for Aarch64Backend {
     fn name(&self) -> &'static str {
         "aarch64"
     }
@@ -76,6 +78,10 @@ impl ArchBackend for Aarch64Backend {
 
     fn ret_reg(&self) -> crate::codegen::Allocation {
         X0.alloc()
+    }
+
+    fn get_stack_ptr(&self) -> Allocation {
+        SP.alloc()
     }
 }
 
