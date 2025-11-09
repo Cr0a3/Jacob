@@ -2,7 +2,7 @@ use procmacro::patterns;
 
 use crate::{
     codegen::{BackendInst, InstrincLowering, Reg},
-    x86::{X86Backend, regs::RAX},
+    x86::{RAX, X86Backend},
 };
 
 impl BackendInst for X86Backend {
