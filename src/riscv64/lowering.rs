@@ -2,7 +2,7 @@ use procmacro::patterns;
 
 use crate::{
     codegen::{BackendInst, InstrincLowering, Reg},
-    riscv64::{Riscv64Backend, regs::A0},
+    riscv64::{A0, Riscv64Backend},
 };
 
 impl BackendInst for Riscv64Backend {

@@ -1,7 +1,7 @@
 use procmacro::patterns;
 
 use crate::{
-    aarch64::{Aarch64Backend, regs::X0},
+    aarch64::{Aarch64Backend, X0},
     codegen::{BackendInst, InstrincLowering, Reg},
 };
 

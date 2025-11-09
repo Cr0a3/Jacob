@@ -1,5 +1,6 @@
 //! This crate contains all procedual macros used in the code generation library
 
+mod backend;
 mod patterns;
 
 use proc_macro::TokenStream;
@@ -32,4 +33,13 @@ use proc_macro::TokenStream;
 #[proc_macro]
 pub fn patterns(input: TokenStream) -> TokenStream {
     patterns::patterns_impl(input)
+}
+
+/// This procmacro is used to define a backend
+///
+/// It automaticlly implemenets registers, you only need to add support for
+/// asmprinting and compilation/decompilation (we reconmend the `patterns macro`)
+#[proc_macro]
+pub fn backend(input: TokenStream) -> TokenStream {
+    backend::backend_impl(input)
 }
